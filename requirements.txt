@@ -1,0 +1,36 @@
+# Core libraries
+#numpy
+#pandas
+#matplotlib
+#seaborn
+
+pandas>=1.5.0
+wordcloud>=1.8.2
+matplotlib>=3.7.0
+seaborn>=0.12.2
+emoji>=2.2.0
+textblob>=0.17.1
+gensim>=4.2.0
+pyLDAvis>=3.4.0
+joblib>=1.2.0
+scikit-learn>=1.2.0
+scipy
+
+# Natural Language Processing (NLP) libraries
+nltk
+#spacy
+
+# Machine Learning (ML) libraries
+#scikit-learn
+
+#keras
+
+
+wordcloud
+
+transformers
+#python-box==6.0.2
+ensure==1.0.2
+fastapi==0.78.0
+
+#-e.
