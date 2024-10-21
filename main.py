@@ -1,26 +1,35 @@
 # helper.py
-
+import streamlit as st
 import pandas as pd
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
-import seaborn as sns
 from collections import Counter
 import emoji
-import os
 from textblob import TextBlob
-import argparse
 
+# Topic Modeling
+from gensim import corpora
+from gensim.models.ldamodel import LdaModel
+import pyLDAvis
+import pyLDAvis.gensim as gensimvis
 
-f=open('stop_hinglish.txt', 'r')
+from matplotlib import font_manager
+st.set_page_config(layout="wide")
+font_path = font_manager.findSystemFonts(fontpaths=None, fontext='ttf')
+
+for font in font_path:
+    if 'NotoSans-Regular.ttf' in font:
+        plt.rcParams['font.family'] = 'sans-serif'
+        plt.rcParams['font.sans-serif'] = ['Noto Sans', 'DejaVu Sans']
+        break
+
+f=open('Data\stop_hinglish.txt', 'r')
 stop_words=f.read()
 
 
 def get_sentiment(text):
     blob = TextBlob(text)
     return blob.sentiment.polarity
-
-
-
 
 def fetch_stats(user, df):
     if user != 'Overall':
@@ -107,16 +116,13 @@ def most_common_words(user, df):
     most_common_df = pd.DataFrame(Counter(words).most_common(20))
     return most_common_df
 
-
-
-def emoji_helper(user, df, font_path='NotoEmoji-VariableFont_wght.ttf'):
+def emoji_helper(user, df):
     if user != 'Overall':
         df = df[df['username'] == user]
     emojis = []
     for message in df['text']:
         emojis.extend([emoji.emojize(c) for c in message if c in emoji.EMOJI_DATA])
     return pd.DataFrame(Counter(emojis).most_common(20))
-
 
 
 def plot_user_sentiment(sentiment_data, title):
@@ -128,44 +134,16 @@ def plot_user_sentiment(sentiment_data, title):
     ax.tick_params(axis='x', rotation=45)
     plt.tight_layout()
     return fig
-    
-# Topic Modeling
-from gensim import corpora
-from gensim.models.ldamodel import LdaModel
-import pyLDAvis
-import pyLDAvis.gensim as gensimvis
 
-def perform_lda(df, num_topics=5, passes=5, chunk_size=10):
-    texts = df['cleaned_text'].apply(lambda x: x.split()).tolist()
+def topic_modeling(texts, num_topics=5):
+    # Tokenize and create dictionary
+    texts = [text.split() for text in texts]
+    dictionary = corpora.Dictionary(texts)
+    corpus = [dictionary.doc2bow(text) for text in texts]
     
-    # Process in chunks to reduce memory usage
-    dictionary = corpora.Dictionary()
-    corpus = []
-    for i in range(0, len(texts), chunk_size):
-        chunk = texts[i:i+chunk_size]
-        dictionary.add_documents(chunk)
-        corpus.extend([dictionary.doc2bow(text) for text in chunk])
+    # Apply LDA model
+    lda_model = LdaModel(corpus, num_topics=num_topics, id2word=dictionary, passes=15)
     
-    lda_model = LdaModel(corpus, num_topics=num_topics, id2word=dictionary, passes=passes)
-    
-    return lda_model, corpus, dictionary
-
-def save_lda_topics(lda_model, output_dir):
-    topics = lda_model.print_topics(num_words=5)
-    topics_file_path = os.path.join(output_dir, 'topics.txt')
-    with open(topics_file_path, 'w', encoding='utf-8') as file:
-        for topic_num, topic in topics:
-            file.write(f"Topic #{topic_num}: {topic}\n")
-    
-    # Return topics for Streamlit display
-    return topics
-
-def create_lda_visualization(lda_model, corpus, dictionary, output_folder):
-    vis = gensimvis.prepare(lda_model, corpus, dictionary)
-
-    # Save the visualization
-    vis_file_path = os.path.join(output_folder, 'lda_vis.html')
-    pyLDAvis.save_html(vis, vis_file_path)
-    
-    # Return path for Streamlit display
-    return vis_file_path
+    # Create pyLDAvis data
+    vis_data = gensimvis.prepare(lda_model, corpus, dictionary,mds='tsne', n_jobs=1)
+    return vis_data

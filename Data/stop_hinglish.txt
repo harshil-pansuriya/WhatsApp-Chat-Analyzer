@@ -498,6 +498,14 @@ keh
 kehte
 kept
 khud
+
+loda
+chodina
+bhosdina
+gand
+bc
+mc
+
 ki
 kin
 kine
@@ -1068,18 +1076,9 @@ medium
 media 
 omitted
 
-loda
-chodina
-bhosdina
-gand
-bc
-mc
-
 
 pachi
 pachhi
-
-
 chhe
 che
 chu
