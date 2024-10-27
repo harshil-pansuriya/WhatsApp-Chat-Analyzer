@@ -14,7 +14,6 @@ import pyLDAvis
 import pyLDAvis.gensim as gensimvis
 
 from matplotlib import font_manager
-st.set_page_config(layout="wide")
 font_path = font_manager.findSystemFonts(fontpaths=None, fontext='ttf')
 
 for font in font_path:
@@ -23,7 +22,7 @@ for font in font_path:
         plt.rcParams['font.sans-serif'] = ['Noto Sans', 'DejaVu Sans']
         break
 
-f=open('Data\stop_hinglish.txt', 'r')
+f=open('Data/stop_hinglish.txt', 'r')
 stop_words=f.read()
 
 

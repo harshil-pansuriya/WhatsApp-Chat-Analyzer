@@ -8,9 +8,21 @@ import matplotlib.font_manager as fm
 # Streamlit UI
 st.set_page_config(layout="wide")
 
-# Set a font that supports emojis
-font_path = fm.findfont(fm.FontProperties(family='Arial Unicode MS'))  # Change to a font that supports emojis
-plt.rcParams['font.family'] = font_path
+import nltk
+import os
+
+# Specify the NLTK data directory
+nltk_data_dir = os.path.join(os.getcwd(), 'nltk_data')
+
+# Create the directory if it doesn't exist
+if not os.path.exists(nltk_data_dir):
+    os.makedirs(nltk_data_dir)
+# Download the required NLTK resources
+nltk.download('punkt_tab', download_dir=nltk_data_dir)
+nltk.download('wordnet', download_dir=nltk_data_dir)
+
+# Set the NLTK data path
+nltk.data.path.append(nltk_data_dir)
 
 st.sidebar.title("WhatsApp Chat Analyzer")
 
@@ -23,7 +35,7 @@ def load_data(uploaded_file, stop_words_file):
     return df, stop_words
 
 uploaded_file = st.sidebar.file_uploader("Choose a WhatsApp chat file", type="txt")
-stop_words_file = 'Data\stop_hinglish.txt'
+stop_words_file = 'Data/stop_hinglish.txt'
 
 if uploaded_file is not None:
     df, stop_words = load_data(uploaded_file, stop_words_file)
@@ -102,8 +114,6 @@ if uploaded_file is not None:
             plt.title('Most Busy Users')
             st.pyplot(fig, clear_figure=True)
             st.write(new_df)
-
-            new_df.to_csv('most_busy_users.csv', index=False)
 
         # WordCloud
         st.title("Wordcloud of chat ")

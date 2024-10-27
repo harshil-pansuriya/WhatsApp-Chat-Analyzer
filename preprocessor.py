@@ -3,8 +3,9 @@ import re
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 
-# load Stopwords file
-with open('Data\stop_hinglish.txt', 'r', encoding='utf-8') as f:
+# load Stopwords files
+file_path = 'Data/stop_hinglish.txt'
+with open(file_path, 'r', encoding='utf-8') as f:
         stop_words = set(f.read().splitlines())
         
 lemmatizer = WordNetLemmatizer()
